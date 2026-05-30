@@ -16,10 +16,19 @@ func InitRedis() {
     })
 }
 
-func PushJob(jobID string) error {
-    return Client.LPush(Ctx, "jobs", jobID).Err()
+func PushJob(queueName string, jobID string) error {
+
+	return Client.LPush(
+		Ctx,
+		queueName,
+		jobID,
+	).Err()
 }
 
-func PopJob() (string, error) {
-    return Client.RPop(Ctx, "jobs").Result()
+func PopJob(queueName string) (string, error) {
+
+	return Client.RPop(
+		Ctx,
+		queueName,
+	).Result()
 }

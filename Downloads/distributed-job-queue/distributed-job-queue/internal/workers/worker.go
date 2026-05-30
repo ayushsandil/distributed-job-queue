@@ -1,25 +1,35 @@
 package workers
 
 import (
-    "fmt"
-    "time"
+	"fmt"
+	"time"
 
-    "distributed-job-queue/internal/queue"
+	"distributed-job-queue/internal/queue"
 )
 
-func StartWorker() {
-    for {
-        jobID, err := queue.PopJob()
+func StartWorker(queueName string) {
 
-        if err != nil {
-            time.Sleep(2 * time.Second)
-            continue
-        }
+	for {
 
-        fmt.Println("Processing Job:", jobID)
+		jobID, err := queue.PopJob(queueName)
 
-        time.Sleep(3 * time.Second)
+		if err != nil {
+			time.Sleep(2 * time.Second)
+			continue
+		}
 
-        fmt.Println("Completed Job:", jobID)
-    }
+		fmt.Printf(
+			"[%s] Processing Job: %s\n",
+			queueName,
+			jobID,
+		)
+
+		time.Sleep(3 * time.Second)
+
+		fmt.Printf(
+			"[%s] Completed Job: %s\n",
+			queueName,
+			jobID,
+		)
+	}
 }

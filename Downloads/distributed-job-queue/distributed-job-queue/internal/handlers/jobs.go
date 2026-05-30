@@ -8,6 +8,7 @@ import (
 
     "github.com/gin-gonic/gin"
     "github.com/google/uuid"
+    "distributed-job-queue/internal/ai"
 )
 
 func CreateJob(c *gin.Context) {
@@ -21,7 +22,22 @@ func CreateJob(c *gin.Context) {
     job.ID = uuid.New().String()
     job.Status = "PENDING"
 
-    err := queue.PushJob(job.ID)
+    jobType, err := ai.ClassifyJob(job.Payload)
+
+    if err != nil {
+    	jobType = "default"
+    }
+
+    job.Type = jobType
+
+    queueName := jobType + "_queue"
+
+    job.Queue = queueName
+
+    err := queue.PushJob(
+    	queueName,
+    	job.ID,
+    )
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
